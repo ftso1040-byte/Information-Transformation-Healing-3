@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>ご予約フォーム ｜ 世界線調律所 - 24時間いつでも簡単WEB予約</title>
+    <meta name="description" content="三位一体調律（トリニティヒーリング）のご予約フォームです。心・身体・現実の流れを整えるセッションをご希望の方はこちらからお申し込みください。">
+    <meta name="robots" content="index,follow">
+    
+    <!-- フォントの読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP (CDN) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Tailwind カスタム設定 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#fffdf9',
+                        panel: '#f6f2ea',
+                        line: '#e7e0d3',
+                        ink: '#33302b',
+                        'ink-soft': '#7a746a',
+                        head: '#2a2620',
+                        gold: '#9c7c46',
+                        'gold-deep': '#7c6035',
+                    },
+                    fontFamily: {
+                        serif: ['"Shippori Mincho"', 'serif'],
+                        sans: ['"Zen Kaku Gothic New"', '"Noto Sans JP"', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- サイト共通のCSSとフォーム独自のCSS -->
+    <style>
+        /* 元サイトのCSS変数 */
+        :root {
+            --bg: #fffdf9; --panel: #f6f2ea; --line: #e7e0d3;
+            --ink: #33302b; --ink-soft: #7a746a; --head: #2a2620;
+            --gold: #9c7c46; --gold-deep: #7c6035;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--ink);
+            line-height: 2.0;
+            letter-spacing: 0.02em;
+        }
+
+        /* -------------------------------------------
+           元サイトと完全に同じヘッダー/メニューのCSS 
+        ------------------------------------------- */
+        nav.site { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 14px; padding: 13px 22px; background: rgba(255, 253, 249, .95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+        nav.site .brand { font-family: "Shippori Mincho", serif; color: var(--head); font-size: 18px; letter-spacing: .1em; margin-right: auto; text-decoration: none; font-weight: 600; }
+        nav.site a.book { color: #fff; background: var(--gold); padding: 8px 18px; border-radius: 30px; text-decoration: none; font-size: 13.5px; letter-spacing: .04em; }
+        nav.site a.book:hover { background: var(--gold-deep); color: #fff; }
+        .nav-toggle { display: none; }
+        .nav-burger { display: inline-flex; flex-direction: column; justify-content: center; gap: 6px; width: 30px; height: 24px; cursor: pointer; }
+        .nav-burger span { display: block; width: 24px; height: 2px; border-radius: 2px; background: var(--head); transition: .25s; }
+        .nav-toggle:checked ~ .nav-burger span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        .nav-toggle:checked ~ .nav-burger span:nth-child(2) { opacity: 0; }
+        .nav-toggle:checked ~ .nav-burger span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        .nav-links { position: absolute; top: 100%; left: 0; right: 0; background: rgba(255, 253, 249, .99); border-bottom: 1px solid var(--line); box-shadow: 0 10px 24px rgba(0, 0, 0, .06); display: flex; flex-direction: column; max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+        .nav-toggle:checked ~ .nav-links { max-height: 80vh; overflow-y: auto; }
+        nav.site .nav-links a { padding: 13px 26px; border-top: 1px solid var(--line); color: var(--ink); text-decoration: none; font-size: 15px; letter-spacing: .03em; }
+        nav.site .nav-links a:hover { background: var(--panel); color: var(--gold-deep); }
+        nav.site .nav-links .nav-group { padding: 15px 26px 5px; border-top: 1px solid var(--line); font-family: "Shippori Mincho", serif; color: var(--gold-deep); font-size: 12.5px; letter-spacing: .1em; }
+        nav.site .nav-links a.sub { padding-left: 42px; font-size: 13.5px; color: var(--ink-soft); border-top: 1px dashed var(--line); }
+        
+        @media(max-width:560px){
+            nav.site { gap: 6px 13px; padding: 11px 16px; }
+            nav.site a { font-size: 12.5px; }
+            nav.site .brand { font-size: 16px; }
+        }
+
+        /* -------------------------------------------
+           フォーム独自のスタイリング 
+        ------------------------------------------- */
+        .text-unit { display: inline-block; white-space: nowrap; }
+        @media (max-width: 767px) {
+            .text-unit { display: inline; white-space: normal; }
+        }
+
+        .form-input {
+            width: 100%; padding: 0.75rem 1rem; background-color: #ffffff;
+            border: 1px solid var(--line); border-radius: 0.375rem; color: var(--ink);
+            transition: all 0.25s ease; font-family: inherit;
+        }
+        .form-input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(156, 124, 70, 0.15); }
+        
+        .required-mark { font-size: 0.75rem; color: #fff; background-color: var(--gold); padding: 0.1rem 0.4rem; border-radius: 0.25rem; margin-left: 0.5rem; vertical-align: middle; }
+
+        .spinner {
+            display: none; width: 1.25rem; height: 1.25rem; border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite;
+            margin-left: 0.5rem; vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .is-loading .spinner { display: inline-block; }
+        .is-loading .btn-text { opacity: 0.8; }
+
+        body.modal-open { overflow: hidden; }
+
+        #toast {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%); z-index: 100;
+            background: var(--head); color: #fff; padding: 1rem 2rem; border-radius: 9999px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2); font-family: "Zen Kaku Gothic New", sans-serif;
+            display: flex; align-items: center; gap: 0.75rem; transition: top 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #toast.show { top: 2rem; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <!-- ヘッダー（元サイトと全く同じ構造） -->
+    <nav class="site">
+        <a class="brand" href="index.html">トリニティヒーリング</a>
+        <a class="book" href="#">ご予約</a>
+        <input type="checkbox" id="navtoggle" class="nav-toggle" aria-hidden="true">
+        <label for="navtoggle" class="nav-burger" aria-label="メニューを開く">
+            <span></span><span></span><span></span>
+        </label>
+        <div class="nav-links">
+            <a href="index.html">ホーム</a>
+            <a href="about.html">世界線調律所とは</a>
+            <a href="profile.html">この世界線に至るまで</a>
+            <a href="menu.html">ご提供メニュー</a>
+            <a href="specialmenu.html">不動産 位相調律</a>
+            <a href="money.html">金運調律セッション</a>
+            <div class="nav-group">コラム｜お金</div>
+            <a class="sub" href="article1.html">お金の流れが悪いのは、なぜ？</a>
+            <a class="sub" href="article2.html">お金持ちほどスピを大切にする理由</a>
+            <a class="sub" href="article3.html">お金のブロックの外し方</a>
+            <a class="sub" href="article4.html">「楽しい」とお金は、つながっている</a>
+            <a class="sub" href="article5.html">「もっと」では幸せになれない理由</a>
+            <div class="nav-group">コラム｜神社・スピリチュアル</div>
+            <a class="sub" href="article6.html">現実主義者の私が神社参拝を始めた理由</a>
+            <a class="sub" href="article7.html">私たちは皆、神々の子孫である</a>
+            <a class="sub" href="article8.html">神社参拝で、ニュータイプになった話</a>
+            <a class="sub" href="article9.html">このヒーリングは何をしているのか</a>
+            <a class="sub" href="article10.html">以和尽礼のお話</a>
+            <div class="nav-group">コラム｜不動産の決断</div>
+            <a class="sub" href="article11.html">親の家、どうすればいいかわからない</a>
+            <a class="sub" href="article12.html">不動産屋に「今しかない」と言われたとき</a>
+            <a class="sub" href="article13.html">「不動産投資」という言葉の違和感</a>
+            <a class="sub" href="article14.html">賃貸を続けるか、家を買うか</a>
+            <a class="sub" href="article15.html">不動産の正解とは…</a>
+            <div class="nav-group">コラム｜意識と現実</div>
+            <a class="sub" href="article16.html">同じ失敗を、何度も繰り返してしまう</a>
+            <a class="sub" href="article17.html">不安で眠れない夜に</a>
+            <a class="sub" href="article18.html">頭ではわかっているのに、変われない</a>
+            <a class="sub" href="article19.html">波動・振動数って、結局なに？</a>
+            <a class="sub" href="article20.html">うまくいく日と、いかない日</a>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-[740px] mx-auto px-6 py-12">
+        <header class="text-center mb-12 gs-reveal">
+            <h1 class="font-serif text-3xl text-head font-semibold tracking-wider mb-4" style="text-wrap: balance;">ご予約フォーム</h1>
+            <p class="text-ink-soft text-sm md:text-base">
+                <span class="text-unit">以下のフォームに必要事項をご入力の上、</span>
+                <span class="text-unit">「入力内容を確認する」ボタンを押してください。</span>
+            </p>
+        </header>
+
+        <div class="bg-panel p-6 md:p-10 rounded-xl shadow-sm border border-line gs-reveal">
+            <form id="reservationForm" class="space-y-8">
+                
+                <!-- お名前 -->
+                <div class="gs-stagger">
+                    <label for="name" class="block font-serif font-semibold text-head mb-2">お名前<span class="required-mark">必須</span></label>
+                    <input type="text" id="name" name="name" class="form-input" placeholder="例：山田 花子" required>
+                </div>
+
+                <!-- ふりがな -->
+                <div class="gs-stagger">
+                    <label for="kana" class="block font-serif font-semibold text-head mb-2">ふりがな<span class="required-mark">必須</span></label>
+                    <input type="text" id="kana" name="kana" class="form-input" placeholder="例：やまだ はなこ" required>
+                </div>
+
+                <!-- メールアドレス -->
+                <div class="gs-stagger">
+                    <label for="email" class="block font-serif font-semibold text-head mb-2">メールアドレス<span class="required-mark">必須</span></label>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="例：info@example.com" required>
+                </div>
+
+                <!-- 電話番号 -->
+                <div class="gs-stagger">
+                    <label for="phone" class="block font-serif font-semibold text-head mb-2">電話番号</label>
+                    <p class="text-xs text-ink-soft mb-2">メールで連絡がつかなかったときのためにお願い申し上げます。</p>
+                    <input type="tel" id="phone" name="phone" class="form-input" placeholder="例：090-0000-0000">
+                </div>
+
+                <!-- ご希望のメニュー -->
+                <div class="gs-stagger">
+                    <label class="block font-serif font-semibold text-head mb-3">ご希望のメニュー<span class="required-mark">必須</span></label>
+                    <div class="space-y-3">
+                        <label class="flex items-start cursor-pointer p-3 border border-line rounded-lg bg-white hover:border-gold transition-colors">
+                            <input type="radio" name="menu" value="初回セッション（オンラインのみ）60分（11,000円）" class="w-5 h-5 mt-0.5 mr-3 accent-[#9c7c46] shrink-0" required>
+                            <span class="text-head">初回セッション（オンラインのみ）60分（11,000円）</span>
+                        </label>
+                        <label class="flex items-start cursor-pointer p-3 border border-line rounded-lg bg-white hover:border-gold transition-colors">
+                            <input type="radio" name="menu" value="三位一体調律セッション（都内限定・対面）120分（22,000円）" class="w-5 h-5 mt-0.5 mr-3 accent-[#9c7c46] shrink-0">
+                            <span class="text-head">三位一体調律セッション（都内限定・対面）120分（22,000円）</span>
+                        </label>
+                        <label class="flex items-start cursor-pointer p-3 border border-line rounded-lg bg-white hover:border-gold transition-colors">
+                            <input type="radio" name="menu" value="金運調律セッション（オンラインのみ）120分×3回（77,000円）" class="w-5 h-5 mt-0.5 mr-3 accent-[#9c7c46] shrink-0">
+                            <span class="text-head">金運調律セッション（オンラインのみ）120分×3回（77,000円）</span>
+                        </label>
+                        <label class="flex items-start cursor-pointer p-3 border border-line rounded-lg bg-white hover:border-gold transition-colors">
+                            <input type="radio" name="menu" value="不動産位相調律セッション（オンラインのみ）初回60〜90分（33,000円）" class="w-5 h-5 mt-0.5 mr-3 accent-[#9c7c46] shrink-0">
+                            <span class="text-head">不動産位相調律セッション（オンラインのみ）初回60〜90分（33,000円）</span>
+                        </label>
+                        <label class="flex items-start cursor-pointer p-3 border border-line rounded-lg bg-white hover:border-gold transition-colors">
+                            <input type="radio" name="menu" value="不動産位相調律セッション（オンラインのみ）240分パック（77,000円）" class="w-5 h-5 mt-0.5 mr-3 accent-[#9c7c46] shrink-0">
+                            <span class="text-head">不動産位相調律セッション（オンラインのみ）240分パック（77,000円）</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 希望日時 -->
+                <div class="gs-stagger">
+                    <label class="block font-serif font-semibold text-head mb-2">ご希望の日時</label>
+                    <p class="text-xs text-gold-deep mb-4 font-medium">※不動産調律セッション（所長）は、19時からのみになります。</p>
+
+                    <div class="space-y-4">
+                        <!-- 第1希望 -->
+                        <div class="p-4 border border-line rounded-lg bg-white">
+                            <label class="block text-sm font-bold text-head mb-1">第1希望<span class="required-mark">必須</span></label>
+                            <p class="text-xs text-ink-soft mb-3">（本日から1週間先以降の日時をご指定ください。）</p>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input type="date" id="date1" name="date1" class="form-input flex-1" required>
+                                <select name="time1" class="form-input flex-1" required>
+                                    <option value="" disabled selected>時間帯を選択</option>
+                                    <option value="9:00〜">9:00〜</option>
+                                    <option value="9:30〜">9:30〜</option>
+                                    <option value="10:00〜">10:00〜</option>
+                                    <option value="10:30〜">10:30〜</option>
+                                    <option value="11:00〜">11:00〜</option>
+                                    <option value="14:00〜">14:00〜</option>
+                                    <option value="14:30〜">14:30〜</option>
+                                    <option value="15:00〜">15:00〜</option>
+                                    <option value="15:30〜">15:30〜</option>
+                                    <option value="16:30〜">16:30〜</option>
+                                    <option value="17:00〜">17:00〜</option>
+                                    <option value="17:30〜">17:30〜</option>
+                                    <option value="18:00〜">18:00〜</option>
+                                    <option value="18:30〜">18:30〜</option>
+                                    <option value="19:00〜">19:00〜</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 第2希望 -->
+                        <div class="p-4 border border-line rounded-lg bg-white">
+                            <label class="block text-sm font-bold text-head mb-1">第2希望<span class="required-mark">必須</span></label>
+                            <p class="text-xs text-ink-soft mb-3">（本日から1週間先以降の日時をご指定ください。）</p>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input type="date" id="date2" name="date2" class="form-input flex-1" required>
+                                <select name="time2" class="form-input flex-1" required>
+                                    <option value="" disabled selected>時間帯を選択</option>
+                                    <option value="9:00〜">9:00〜</option>
+                                    <option value="9:30〜">9:30〜</option>
+                                    <option value="10:00〜">10:00〜</option>
+                                    <option value="10:30〜">10:30〜</option>
+                                    <option value="11:00〜">11:00〜</option>
+                                    <option value="14:00〜">14:00〜</option>
+                                    <option value="14:30〜">14:30〜</option>
+                                    <option value="15:00〜">15:00〜</option>
+                                    <option value="15:30〜">15:30〜</option>
+                                    <option value="16:30〜">16:30〜</option>
+                                    <option value="17:00〜">17:00〜</option>
+                                    <option value="17:30〜">17:30〜</option>
+                                    <option value="18:00〜">18:00〜</option>
+                                    <option value="18:30〜">18:30〜</option>
+                                    <option value="19:00〜">19:00〜</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 第3希望 -->
+                        <div class="p-4 border border-line rounded-lg bg-white">
+                            <label class="block text-sm font-bold text-head mb-1">第3希望<span class="required-mark">必須</span></label>
+                            <p class="text-xs text-ink-soft mb-3">（本日から1週間先以降の日時をご指定ください。）</p>
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <input type="date" id="date3" name="date3" class="form-input flex-1" required>
+                                <select name="time3" class="form-input flex-1" required>
+                                    <option value="" disabled selected>時間帯を選択</option>
+                                    <option value="9:00〜">9:00〜</option>
+                                    <option value="9:30〜">9:30〜</option>
+                                    <option value="10:00〜">10:00〜</option>
+                                    <option value="10:30〜">10:30〜</option>
+                                    <option value="11:00〜">11:00〜</option>
+                                    <option value="14:00〜">14:00〜</option>
+                                    <option value="14:30〜">14:30〜</option>
+                                    <option value="15:00〜">15:00〜</option>
+                                    <option value="15:30〜">15:30〜</option>
+                                    <option value="16:30〜">16:30〜</option>
+                                    <option value="17:00〜">17:00〜</option>
+                                    <option value="17:30〜">17:30〜</option>
+                                    <option value="18:00〜">18:00〜</option>
+                                    <option value="18:30〜">18:30〜</option>
+                                    <option value="19:00〜">19:00〜</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- メッセージ -->
+                <div class="gs-stagger">
+                    <label for="message" class="block font-serif font-semibold text-head mb-2">現在のお悩みや、当日聞きたいことなど</label>
+                    <p class="text-xs text-ink-soft mb-2">ご自由にご記入ください。</p>
+                    <textarea id="message" name="message" rows="4" class="form-input resize-y"></textarea>
+                </div>
+
+                <!-- ボタンエリア -->
+                <div class="text-center pt-6 gs-stagger">
+                    <p class="text-xs text-ink-soft mb-6 max-w-sm mx-auto leading-relaxed">
+                        ご入力ありがとうございました。<br>送信が完了しましたら、3営業日以内に担当者より折り返しご連絡させていただきます。
+                    </p>
+                    <button type="button" id="confirmBtn" class="inline-block px-10 py-4 rounded-full font-serif tracking-widest text-white font-semibold bg-gold shadow-lg transition-transform hover:bg-gold-deep hover:-translate-y-1">
+                        入力内容を確認する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="max-w-[740px] mx-auto pt-6 pb-12 border-t border-line text-ink-soft text-sm text-center">
+        <div class="mb-2"><a href="index.html" class="hover:text-gold-deep transition-colors">ホームへ戻る</a></div>
+        <div>© 世界線調律所 Worldline Tuning Institute</div>
+    </footer>
+
+    <!-- 確認モーダル -->
+    <div id="confirmModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div id="modalOverlay" class="absolute inset-0 bg-head/80 backdrop-blur-sm"></div>
+        
+        <div class="relative bg-bg w-full max-w-lg mx-4 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-6 md:p-8 overflow-y-auto">
+                <h3 class="font-serif text-xl font-semibold text-head mb-6 border-b border-line pb-3">入力内容のご確認</h3>
+                
+                <dl class="space-y-4 text-sm md:text-base">
+                    <div><dt class="text-ink-soft font-medium text-xs mb-1">お名前</dt><dd id="conf-name" class="font-semibold text-head break-words"></dd></div>
+                    <div><dt class="text-ink-soft font-medium text-xs mb-1">ふりがな</dt><dd id="conf-kana" class="font-semibold text-head break-words"></dd></div>
+                    <div><dt class="text-ink-soft font-medium text-xs mb-1">メールアドレス</dt><dd id="conf-email" class="font-semibold text-head break-words"></dd></div>
+                    <div><dt class="text-ink-soft font-medium text-xs mb-1">電話番号</dt><dd id="conf-phone" class="font-semibold text-head break-words"></dd></div>
+                    <div><dt class="text-ink-soft font-medium text-xs mb-1">ご希望のメニュー</dt><dd id="conf-menu" class="font-semibold text-head break-words whitespace-pre-wrap"></dd></div>
+                    <div><dt class="text-ink-soft font-medium text-xs mb-1">第1希望日時</dt><dd id="conf-date1" class="font-semibold text-head break-words"></dd></div>
+                    <div><dt class="text-ink-soft font-medium text-xs mb-1">第2希望日時</dt><dd id="conf-date2" class="font-semibold text-head break-words"></dd></div>
+                    <div><dt class="text-ink-soft font-medium text-xs mb-1">第3希望日時</dt><dd id="conf-date3" class="font-semibold text-head break-words"></dd></div>
+                    <div><dt class="text-ink-soft font-medium text-xs mb-1">メッセージ</dt><dd id="conf-message" class="font-semibold text-head whitespace-pre-wrap break-words"></dd></div>
+                </dl>
+            </div>
+            
+            <div class="bg-panel p-4 flex gap-3 justify-end border-t border-line">
+                <button type="button" id="backBtn" class="px-5 py-2.5 rounded-full text-sm font-medium text-ink-soft hover:bg-white hover:text-head transition-colors border border-transparent hover:border-line">修正する</button>
+                <button type="button" id="submitBtn" class="px-6 py-2.5 rounded-full text-sm font-medium text-white bg-gold hover:bg-gold-deep transition-colors flex items-center">
+                    <span class="btn-text">この内容で送信する</span>
+                    <div class="spinner"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- トースト通知 -->
+    <div id="toast">
+        <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <span id="toastMessage">予約リクエストを送信しました</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // GSAP アニメーション
+            gsap.from(".gs-reveal", { y: 30, opacity: 0, duration: 1, stagger: 0.2, ease: "power3.out", delay: 0.1 });
+            gsap.from(".gs-stagger", { y: 20, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power2.out", delay: 0.4 });
+
+            const form = document.getElementById('reservationForm');
+            const confirmBtn = document.getElementById('confirmBtn');
+            const modal = document.getElementById('confirmModal');
+            const overlay = document.getElementById('modalOverlay');
+            const backBtn = document.getElementById('backBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            // 日付の最小値を1週間後に設定
+            const today = new Date();
+            const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const yyyy = nextWeek.getFullYear();
+            const mm = String(nextWeek.getMonth() + 1).padStart(2, '0');
+            const dd = String(nextWeek.getDate()).padStart(2, '0');
+            const minDateStr = `${yyyy}-${mm}-${dd}`;
+
+            document.getElementById('date1').min = minDateStr;
+            document.getElementById('date2').min = minDateStr;
+            document.getElementById('date3').min = minDateStr;
+
+            const openModal = () => {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                document.body.classList.add('modal-open');
+            };
+            const closeModal = () => {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                document.body.classList.remove('modal-open');
+            };
+
+            const showToast = (message, isError = false) => {
+                toastMessage.textContent = message;
+                if(isError) {
+                    toast.style.background = '#e53e3e';
+                    toast.querySelector('svg').style.display = 'none';
+                } else {
+                    toast.style.background = '#2a2620';
+                    toast.querySelector('svg').style.display = 'block';
+                }
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 4000);
+            };
+
+            confirmBtn.addEventListener('click', () => {
+                const selectedMenu = form.querySelector('input[name="menu"]:checked');
+                if (!selectedMenu) {
+                    showToast("ご希望のメニューを選択してください。", true);
+                    return;
+                }
+
+                if (!form.reportValidity()) return;
+
+                document.getElementById('conf-name').textContent = form.name.value;
+                document.getElementById('conf-kana').textContent = form.kana.value;
+                document.getElementById('conf-email').textContent = form.email.value;
+                document.getElementById('conf-phone').textContent = form.phone.value || '未入力';
+                document.getElementById('conf-menu').textContent = selectedMenu.value;
+                document.getElementById('conf-date1').textContent = `${form.date1.value} ${form.time1.value}`;
+                document.getElementById('conf-date2').textContent = `${form.date2.value} ${form.time2.value}`;
+                document.getElementById('conf-date3').textContent = `${form.date3.value} ${form.time3.value}`;
+                document.getElementById('conf-message').textContent = form.message.value || 'なし';
+
+                openModal();
+            });
+
+            backBtn.addEventListener('click', closeModal);
+            overlay.addEventListener('click', closeModal);
+
+            submitBtn.addEventListener('click', async () => {
+                
+                // 【重要】ここにGASの「ウェブアプリURL」を貼り付けます
+                const GAS_URL = "https://script.google.com/macros/s/ここにあなたのGASのURLが入ります/exec";
+
+                const formData = new FormData(form);
+                
+                submitBtn.classList.add('is-loading');
+                submitBtn.disabled = true;
+
+                try {
+                    const response = await fetch(GAS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: formData
+                    });
+
+                    closeModal();
+                    showToast("ご予約リクエストを送信しました！自動返信メールをご確認ください。");
+                    form.reset();
+
+                } catch (error) {
+                    console.error('送信エラー:', error);
+                    closeModal();
+                    showToast("送信に失敗しました。時間をおいて再度お試しください。", true);
+                } finally {
+                    submitBtn.classList.remove('is-loading');
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
